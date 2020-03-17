@@ -38,4 +38,6 @@ Once you have input your clips and mappings, then press the `Retarget` button, a
 ## Retargeting Presets
   You can create as many retargeting presets as you need and drag them into the interface to use them. To create more presets create a new `Animation Retargeting Data` from the `Create` menu.
 
-Find this utility helpful? Perhaps you will also find my Unity asset [Project Search & Replace](https://assetstore.unity.com/packages/tools/utilities/project-search-replace-55680) helpful.
+# Find this utility helpful? 
+
+Perhaps you will also find my Unity asset [Project Search & Replace](https://assetstore.unity.com/packages/tools/utilities/project-search-replace-55680) helpful.
