@@ -1,0 +1,12 @@
+{
+    "name": "com.enemyhideout.retargeting",
+    "displayName": "Animation Retargeting Utility",
+    "version": "0.0.1",
+    "unity": "2018.4",
+    "description": "An animation retargeting utility for remapping properties for various purposes.",
+    "keywords": [
+        "animation",
+        "unity"
+    ],
+    "category": "Unity"
+}
