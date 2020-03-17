@@ -4,6 +4,8 @@ This is an editor window for the Unity game engine that allows for the retargeti
  * Renaming one property to another (for example from `browInnerUp` to `BrowsOuterLower_Left`
  * Deleting unnecessary properties (for example if a rig does not support it).
  * Copying one attribute over to a new one (for example to duplicate keys to right and left from a rig that only supports one side).
+
+![Screenshot](screenshot.png) 
  
 # Installation
 You can install this editor through [Unity's package manager](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@1.8/manual/index.html). 
@@ -15,4 +17,8 @@ Alternatively you can add the following to your 'dependencies' in your Packages/
     "com.enemyhideout.retargeting": "https://github.com/robotron2084/animation-retargeting.git",
 ```
 
-Find this utility helpful? Perhaps you will also find my unity asset [Project Search & Replace](https://assetstore.unity.com/packages/tools/utilities/project-search-replace-55680) helpful.
+# Usage
+
+
+
+Find this utility helpful? Perhaps you will also find my Unity asset [Project Search & Replace](https://assetstore.unity.com/packages/tools/utilities/project-search-replace-55680) helpful.
