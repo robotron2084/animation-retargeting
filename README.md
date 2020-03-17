@@ -8,9 +8,12 @@ This is an editor window for the Unity game engine that allows for the retargeti
 ![Screenshot](screenshot.png) 
  
 # Installation
+
+This package should work on Unity 2018+
+
 You can install this editor through [Unity's package manager](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@1.8/manual/index.html). 
 
-In 2019 you can install the latest from this github by [following these instructions](https://docs.unity3d.com/Manual/upm-ui-giturl.html). 
+In Unity 2019 you can install the latest from this github by [following these instructions](https://docs.unity3d.com/Manual/upm-ui-giturl.html). 
 Alternatively you can add the following to your 'dependencies' in your Packages/manifest.json file:
 
 ```
