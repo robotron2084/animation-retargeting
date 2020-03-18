@@ -1,15 +1,26 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Animations;
 using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
 
 namespace com.enemyhideout.retargeting
 {
 
   public class AnimationRetargetingWindow : EditorWindow
   {
-
+      [SerializeField]
       AnimationRetargetingData targetingData;
       Vector2 scrollPos;
+
+      [SerializeField]
+      List<UnityEngine.Object> items = new List<UnityEngine.Object>();
+
+      [SerializeField]
+      public float number = 10.0f;
 
       [MenuItem("Window/Animation/Retargeting")]
       static void Init()
@@ -25,13 +36,11 @@ namespace com.enemyhideout.retargeting
         if(targetingData != null)
         {
           SerializedObject so = new SerializedObject(targetingData);
-          SerializedProperty clips = so.FindProperty("selectedClips");
+          SerializedObject windowSO = new SerializedObject(this);
           SerializedProperty attributeMappings = so.FindProperty("attributeMappings");
-          if(targetingData.selectedClips.Count == 0)
-          {
-            EditorGUILayout.HelpBox("Drag animation clips into the 'Clips' array below to retarget them.", MessageType.Info);
-          }
-          EditorGUILayout.PropertyField(clips, new GUIContent("Clips"), true);
+          EditorGUILayout.HelpBox("Drag Animation Clips, Animators, or Folders into the Items list below to retarget all clips inside them.", MessageType.Info);
+          SerializedProperty itemsProp = windowSO.FindProperty("items");
+          EditorGUILayout.PropertyField(itemsProp, new GUIContent("Items"), true);
 
           SerializedProperty inputPrefix = so.FindProperty("inputPrefix");
           EditorGUILayout.PropertyField(inputPrefix, new GUIContent("Input Prefix"));
@@ -43,40 +52,86 @@ namespace com.enemyhideout.retargeting
           }
           EditorGUILayout.PropertyField(attributeMappings, new GUIContent("Attribute Mappings"), true);
           so.ApplyModifiedProperties();
+          windowSO.ApplyModifiedProperties();
 
           if(GUILayout.Button("Retarget"))
           {
-            Debug.Log("[AnimationRetargetingWindow] Doing retargeting.");
             AttributeMapper remapper = new AttributeMapper();
-            remapper.Retarget(targetingData);
+            List<AnimationClip> clips = getClipsFromItems(items);
+            
+            remapper.Retarget(targetingData, clips);
           }
         }else{
           // display help
           EditorGUILayout.HelpBox("In order to retarget animations, you need to create an Animation Retargeting scriptable object or select one of the ones that comes with the project.", MessageType.Info);
-          string path = AssetDatabase.GetAssetPath (Selection.activeObject);
-          if (path == "") 
+          if(GUILayout.Button("Create Animation Retargeting Data" ))
           {
-            path = "Assets";
-          } 
-          else if (Path.GetExtension (path) != "") 
-          {
-            path = path.Replace (Path.GetFileName (AssetDatabase.GetAssetPath (Selection.activeObject)), "");
-          }
-
-          if(GUILayout.Button("Create Animation Retargeting Data in " + path))
-          {
-            targetingData = ScriptableObject.CreateInstance<AnimationRetargetingData>();
-            string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath (path + "/AnimationRetargeting.asset");
-             
-            AssetDatabase.CreateAsset (targetingData, assetPathAndName);
-         
-            AssetDatabase.SaveAssets ();
-            AssetDatabase.Refresh();
-            EditorUtility.FocusProjectWindow ();
+            createInstance<AnimationRetargetingData>("Animation Retargeting", ref targetingData);
           }
         }
 
         EditorGUILayout.EndScrollView();
+      }
+
+      void createInstance<T>(string defaultName, ref T value) where T : ScriptableObject
+      {
+        string path = AssetDatabase.GetAssetPath (Selection.activeObject);
+        if (path == "") 
+        {
+          path = "Assets";
+        } 
+        else if (Path.GetExtension (path) != "") 
+        {
+          path = path.Replace (Path.GetFileName (AssetDatabase.GetAssetPath (Selection.activeObject)), "");
+        }
+
+        value = ScriptableObject.CreateInstance<T>();
+        string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath (path + "/"+defaultName+".asset");
+         
+        AssetDatabase.CreateAsset (value, assetPathAndName);
+      
+        AssetDatabase.SaveAssets ();
+        AssetDatabase.Refresh();
+        EditorUtility.FocusProjectWindow ();
+      }
+
+      List<AnimationClip> getClipsFromItems(List<UnityEngine.Object> items)
+      {
+        List<AnimationClip> retVal = new List<AnimationClip>();
+        foreach(UnityEngine.Object item in items)
+        {
+          if(item != null)
+          {
+            if(item is AnimationClip)
+            {
+              retVal.Add((AnimationClip) item);
+            }else
+            if(item is AnimatorController)
+            {
+              Debug.Log("[AnimationRetargetingWindow] Found AnimatorController.");
+              AnimatorController ac = (AnimatorController)item;
+              retVal.AddRange(ac.animationClips);
+            }else
+            if(item is UnityEditor.DefaultAsset)
+            {
+              string path = AssetDatabase.GetAssetPath(item);
+              if(Directory.Exists(path))
+              {
+                string[] guids = AssetDatabase.FindAssets("t:AnimationClip", new string[]{ path });
+                foreach(string guid in guids)
+                {
+                  string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                  AnimationClip clip = (AnimationClip)AssetDatabase.LoadAssetAtPath(assetPath, typeof(AnimationClip));
+                  retVal.Add(clip);
+                }
+              }
+            }
+            else{
+              Debug.LogWarning("[AnimationRetargetingWindow] WARNING! " + item + " is not a clip, animator, or Folder!");
+            }
+          }
+        }
+        return retVal.Distinct().ToList();
       }
   }
 }

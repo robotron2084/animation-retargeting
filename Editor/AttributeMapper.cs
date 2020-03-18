@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -13,10 +14,14 @@ namespace com.enemyhideout.retargeting
           "m_EditorCurves"
         };
 
-        public void Retarget(AnimationRetargetingData targetingData)
+        StringBuilder logger;
+
+        public void Retarget(AnimationRetargetingData targetingData, List<AnimationClip> selectedClips)
         {
-          foreach(AnimationClip clip in targetingData.selectedClips)
+          initLogger();
+          foreach(AnimationClip clip in selectedClips)
           {
+            log("[AttributeMapper] Retargeting clip:"  + clip);
             SerializedObject so = new SerializedObject(clip);
 
             foreach(AttributeMapping mapping in targetingData.attributeMappings)
@@ -24,16 +29,16 @@ namespace com.enemyhideout.retargeting
               List<SerializedProperty> props = propertiesFor(so, targetingData.inputPrefix + "." + mapping.fromPath, baseProperties);
               if(props.Count == 0)
               {
-                Debug.Log("[AttributeMapper] did not find property:"  +mapping.fromPath);
+                log("[AttributeMapper] did not find property:"  +mapping.fromPath);
               }else{
 
                 switch(mapping.action)
                 {
                   case AttributeMappingAction.Replace:
-                    Debug.Log("[AttributeMapper] Replacing "+mapping.fromPath +" to " + mapping.toPath);
+                    log("[AttributeMapper] Replacing "+mapping.fromPath +" to " + mapping.toPath);
                     foreach(SerializedProperty prop in props)
                     {
-                      Debug.Log("[AttributeMapper] found property...modifying."+ prop.propertyPath);
+                      // log("[AttributeMapper] found property...modifying."+ prop.propertyPath);
                       prop.stringValue = targetingData.outputPrefix + "." + mapping.toPath;
                     }
                     
@@ -49,10 +54,10 @@ namespace com.enemyhideout.retargeting
                         parentProp.InsertArrayElementAtIndex(index);
                         SerializedProperty dupeProp = parentProp.GetArrayElementAtIndex(index+1).FindPropertyRelative("attribute");
 
-                        // Debug.Log("[AttributeMapper.COPY] found property...modifying."+ dupeProp.propertyPath);
+                        // log("[AttributeMapper.COPY] found property...modifying."+ dupeProp.propertyPath);
                         dupeProp.stringValue = targetingData.outputPrefix + "." + mapping.toPath;
                       }else{
-                        Debug.Log("[AttributeMapper] did not find index....");
+                        log("[AttributeMapper] did not find index....");
                       }
                     }
                   break;
@@ -66,7 +71,7 @@ namespace com.enemyhideout.retargeting
                     {
                       parentProp.DeleteArrayElementAtIndex(index);
                     }else{
-                      Debug.Log("[AttributeMapper] did not find index....");
+                      log("[AttributeMapper] did not find index....");
                     }
                   }
                   break;
@@ -74,9 +79,9 @@ namespace com.enemyhideout.retargeting
                 }
               }
             }
-
             so.ApplyModifiedProperties();
           }
+          flushLog();
         }
 
         List<SerializedProperty> propertiesFor(SerializedObject so, string propSearch, List<string> baseProperties)
@@ -88,23 +93,23 @@ namespace com.enemyhideout.retargeting
             SerializedProperty curves = so.FindProperty(baseProperty);
             SerializedProperty endSentinel = curves.Copy();
             endSentinel.Next(false);
-            // Debug.Log("[AttributeMapper] end:" + endSentinel.propertyPath);
+            // Log("[AttributeMapper] end:" + endSentinel.propertyPath);
             curves.Next(true);
             curves.Next(true);
             while(curves.Next(false) && !SerializedProperty.EqualContents(curves, endSentinel))
             {
-              // Debug.Log("[AttributeMapper] prop:" + curves.propertyPath + " " + curves.propertyType);
+              // Log("[AttributeMapper] prop:" + curves.propertyPath + " " + curves.propertyType);
               SerializedProperty child = curves.FindPropertyRelative("attribute");
 
               if(child != null)
               {
-                // Debug.Log("[AttributeMapper] child:" + child.propertyPath + " " + child.stringValue);
+                // Log("[AttributeMapper] child:" + child.propertyPath + " " + child.stringValue);
                 if(child.stringValue == propSearch)
                 {
                   retVal.Add(child);
                 }
               }else{
-                Debug.Log("[AttributeMapper] nope");
+                // log("[AttributeMapper] nope");
               }
             }
           }
@@ -134,6 +139,27 @@ namespace com.enemyhideout.retargeting
           SerializedProperty parentProp = prop.serializedObject.FindProperty(propPath);
           return parentProp;
           
+        }
+
+        void log(string message)
+        {
+          logger.AppendLine(message);
+        }
+
+        void flushLog()
+        {
+          string log = logger.ToString();
+          if(log.Length > 0)
+          {
+            Debug.Log(logger);
+          }
+          initLogger();
+          logger = new StringBuilder();
+        }
+
+        void initLogger()
+        {
+          logger = new StringBuilder();
         }
     }
 }
