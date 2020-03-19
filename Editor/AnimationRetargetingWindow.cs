@@ -53,13 +53,12 @@ namespace com.enemyhideout.retargeting
           retargetingIndex = retargetingOptions.Count-1;
           targetingData = retargetingOptions[retargetingIndex];
         }
-        int newIndex = EditorGUILayout.Popup("Retargeting Option", retargetingIndex, retargetingOptionsLabels);
+        int newIndex = EditorGUILayout.Popup("Select An Option", retargetingIndex, retargetingOptionsLabels);
         if(newIndex != retargetingIndex)
         {
           retargetingIndex = newIndex;
-          targetingData = retargetingOptions[retargetingIndex];
-
         }
+        targetingData = retargetingOptions[retargetingIndex];
         if(targetingData != null)
         {
           if(GUILayout.Button("Copy", GUILayout.Width(100)))
@@ -68,19 +67,19 @@ namespace com.enemyhideout.retargeting
             AnimationRetargetingData copy = Instantiate(targetingData);
             copy.isPreset = false;
             saveAsset(copyPath, copy);
-            copy.name = Path.GetFileName(copyPath);
+            copy.name = Path.GetFileNameWithoutExtension(copyPath);
             targetingData = copy;
             updateRetargetingOptions();
             updateRetargetingIndex();
           }
-
-          if(GUILayout.Button("New", GUILayout.Width(100)))
-          {
-            createInstance<AnimationRetargetingData>("Animation Retargeting", ref targetingData);
-            updateRetargetingOptions();
-            updateRetargetingIndex();
-          }
         }
+        if(GUILayout.Button("New", GUILayout.Width(100)))
+        {
+          createInstance<AnimationRetargetingData>("Animation Retargeting", ref targetingData);
+          updateRetargetingOptions();
+          updateRetargetingIndex();
+        }
+
         EditorGUILayout.EndHorizontal();
         // targetingData = (AnimationRetargetingData)EditorGUILayout.ObjectField(targetingData, typeof(AnimationRetargetingData), false);
         if(targetingData != null)

@@ -8,7 +8,7 @@ namespace com.enemyhideout.retargeting
 
     public enum AttributeMappingAction
     {
-      Replace,
+      Rename,
       Copy,
       Delete
     }

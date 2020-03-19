@@ -24,7 +24,7 @@ Alternatively you can add the following to your 'dependencies' in your Packages/
 
 First open the utility via `Window->Animation->Retargeting`
 
-Upon first open, the window will prompt you that you need to create an Animation Retargeting scriptable object. Press the button to do so. Your settings for retargeting will be saved to this asset.
+Upon first open, you will need to select a retargeting option or create a new one. A retargeting option defines the actions you want to occur on your animations.
 
 Next you must specify which Animation Clips you would like to modify. You can do this by dragging items into the `Items` UI. You can drag the following items into the UI:
   * Animation Clips
@@ -36,7 +36,7 @@ Lastly you must specify a number of 'attribute mapping' actions. These are the p
   * `To Path` - The new name of the property.
   * `Action` - This can be either `Copy`, `Replace`, or `Delete`.
     * `Copy` - Make a copy of this property with the `To Path` name.
-    * `Replace` - Rename the property to the `To Path`'s name.
+    * `Rename` - Rename the property to the `To Path`'s name.
     * `Delete` - Delete this property.
 
 Once you have input your clips and mappings, then press the `Retarget` button, and the tool will iterate over your animation clips and update them. And that's it! A log of all properties modified, and all properties not found, will be put displayed in the Console.

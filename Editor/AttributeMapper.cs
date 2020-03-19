@@ -34,8 +34,8 @@ namespace com.enemyhideout.retargeting
 
                 switch(mapping.action)
                 {
-                  case AttributeMappingAction.Replace:
-                    log("[AttributeMapper] Replacing "+mapping.fromPath +" to " + mapping.toPath);
+                  case AttributeMappingAction.Rename:
+                    log("[AttributeMapper] Renaming "+mapping.fromPath +" to " + mapping.toPath);
                     foreach(SerializedProperty prop in props)
                     {
                       // log("[AttributeMapper] found property...modifying."+ prop.propertyPath);
