@@ -17,7 +17,7 @@ In Unity 2019 you can install the latest from this github by [following these in
 Alternatively you can add the following to your 'dependencies' in your Packages/manifest.json file:
 
 ```
-    "com.enemyhideout.retargeting": "https://github.com/robotron2084/animation-retargeting.git",
+    "com.enemyhideout.retargeting": "https://github.com/robotron2084/animation-retargeting.git#0.0.2",
 ```
 
 # Usage
