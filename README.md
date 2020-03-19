@@ -24,7 +24,7 @@ Alternatively you can add the following to your 'dependencies' in your Packages/
 
 First open the utility via `Window->Animation->Retargeting`
 
-Upon first open, you will need to select a retargeting option or create a new one. A retargeting option defines the actions you want to occur on your animations.
+Upon first open, you will probably need to select a retargeting preset or create a new one. A retargeting preset defines the actions you want to occur on your animations.
 
 Next you must specify which Animation Clips you would like to modify. You can do this by dragging items into the `Items` UI. You can drag the following items into the UI:
   * Animation Clips
@@ -42,7 +42,7 @@ Lastly you must specify a number of 'attribute mapping' actions. These are the p
 Once you have input your clips and mappings, then press the `Retarget` button, and the tool will iterate over your animation clips and update them. And that's it! A log of all properties modified, and all properties not found, will be put displayed in the Console.
 
 ## Retargeting Presets
-  You can create as many retargeting presets as you need and drag them into the interface to use them. To create more presets create a new `Animation Retargeting Data` from the `Create` menu.
+  You can create as many retargeting presets as you need by duplicating an existing preset via `Copy` or creating a new one by selecting `New`. The location the preset is created is determined by the currently selected asset in the Project hierarchy.
 
 # Find this utility helpful? 
 
