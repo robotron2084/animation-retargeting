@@ -1,0 +1,174 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b450e5502417243e8a24aff566256da7, type: 3}
+  m_Name: DeleteAll_AppleBlendshapes
+  m_EditorClassIdentifier: 
+  isPreset: 1
+  inputPrefix: blendShape.shapes
+  outputPrefix: blendShape
+  attributeMappings:
+  - fromPath: browInnerUp
+    action: 2
+    toPath: 
+  - fromPath: browDown_L
+    action: 2
+    toPath: 
+  - fromPath: browDown_R
+    action: 2
+    toPath: 
+  - fromPath: browOuterUp_L
+    action: 2
+    toPath: 
+  - fromPath: browOuterUp_R
+    action: 2
+    toPath: 
+  - fromPath: eyeLookUp_L
+    action: 2
+    toPath: 
+  - fromPath: eyeLookUp_R
+    action: 2
+    toPath: 
+  - fromPath: eyeLookDown_L
+    action: 2
+    toPath: 
+  - fromPath: eyeLookDown_R
+    action: 2
+    toPath: 
+  - fromPath: eyeLookIn_L
+    action: 2
+    toPath: 
+  - fromPath: eyeLookIn_R
+    action: 2
+    toPath: 
+  - fromPath: eyeLookOut_L
+    action: 2
+    toPath: 
+  - fromPath: eyeLookOut_R
+    action: 2
+    toPath: 
+  - fromPath: eyeBlink_L
+    action: 2
+    toPath: 
+  - fromPath: eyeBlink_R
+    action: 2
+    toPath: 
+  - fromPath: eyeSquint_L
+    action: 2
+    toPath: 
+  - fromPath: eyeSquint_R
+    action: 2
+    toPath: 
+  - fromPath: eyeWide_L
+    action: 2
+    toPath: 
+  - fromPath: eyeWide_R
+    action: 2
+    toPath: 
+  - fromPath: cheekPuff
+    action: 2
+    toPath: 
+  - fromPath: cheekSquint_L
+    action: 2
+    toPath: 
+  - fromPath: cheekSquint_R
+    action: 2
+    toPath: 
+  - fromPath: noseSneer_L
+    action: 2
+    toPath: 
+  - fromPath: noseSneer_R
+    action: 2
+    toPath: 
+  - fromPath: jawOpen
+    action: 2
+    toPath: 
+  - fromPath: jawForward
+    action: 2
+    toPath: 
+  - fromPath: jawLeft
+    action: 2
+    toPath: 
+  - fromPath: jawRight
+    action: 2
+    toPath: 
+  - fromPath: mouthFunnel
+    action: 2
+    toPath: 
+  - fromPath: mouthPucker
+    action: 2
+    toPath: 
+  - fromPath: mouthLeft
+    action: 2
+    toPath: 
+  - fromPath: mouthRight
+    action: 2
+    toPath: 
+  - fromPath: mouthRollUpper
+    action: 2
+    toPath: 
+  - fromPath: mouthRollLower
+    action: 2
+    toPath: 
+  - fromPath: mouthShrugUpper
+    action: 2
+    toPath: 
+  - fromPath: mouthShrugLower
+    action: 2
+    toPath: 
+  - fromPath: mouthClose
+    action: 2
+    toPath: 
+  - fromPath: mouthSmile_L
+    action: 2
+    toPath: 
+  - fromPath: mouthSmile_R
+    action: 2
+    toPath: 
+  - fromPath: mouthFrown_L
+    action: 2
+    toPath: 
+  - fromPath: mouthFrown_R
+    action: 2
+    toPath: 
+  - fromPath: mouthDimple_L
+    action: 2
+    toPath: 
+  - fromPath: mouthDimple_R
+    action: 2
+    toPath: 
+  - fromPath: mouthUpperUp_L
+    action: 2
+    toPath: 
+  - fromPath: mouthUpperUp_R
+    action: 2
+    toPath: 
+  - fromPath: mouthLowerDown_L
+    action: 2
+    toPath: 
+  - fromPath: mouthLowerDown_R
+    action: 2
+    toPath: 
+  - fromPath: mouthPress_L
+    action: 2
+    toPath: 
+  - fromPath: mouthPress_R
+    action: 2
+    toPath: 
+  - fromPath: mouthStretch_L
+    action: 2
+    toPath: 
+  - fromPath: mouthStretch_R
+    action: 2
+    toPath: 
+  - fromPath: tongueOut
+    action: 2
+    toPath: 

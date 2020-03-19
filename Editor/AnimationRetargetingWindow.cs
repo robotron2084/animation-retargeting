@@ -13,11 +13,21 @@ namespace com.enemyhideout.retargeting
   public class AnimationRetargetingWindow : EditorWindow
   {
       [SerializeField]
+      List<AnimationRetargetingData> retargetingOptions;
+
+      [SerializeField]
+      int retargetingIndex;
+
+      [SerializeField]
+      string[] retargetingOptionsLabels;
+
+      [SerializeField]
       AnimationRetargetingData targetingData;
       Vector2 scrollPos;
 
       [SerializeField]
       List<UnityEngine.Object> items = new List<UnityEngine.Object>();
+
 
       [SerializeField]
       public float number = 10.0f;
@@ -29,10 +39,50 @@ namespace com.enemyhideout.retargeting
           window.Show();
       }
 
+      void OnFocus()
+      {
+        updateRetargetingOptions();
+      }
+
       void OnGUI()
       {
-        scrollPos = EditorGUILayout.BeginScrollView(scrollPos); 
-        targetingData = (AnimationRetargetingData)EditorGUILayout.ObjectField(targetingData, typeof(AnimationRetargetingData), false);
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+        EditorGUILayout.BeginHorizontal();
+        if(retargetingIndex >= retargetingOptions.Count)
+        {
+          retargetingIndex = retargetingOptions.Count-1;
+          targetingData = retargetingOptions[retargetingIndex];
+        }
+        int newIndex = EditorGUILayout.Popup("Retargeting Option", retargetingIndex, retargetingOptionsLabels);
+        if(newIndex != retargetingIndex)
+        {
+          retargetingIndex = newIndex;
+          targetingData = retargetingOptions[retargetingIndex];
+
+        }
+        if(targetingData != null)
+        {
+          if(GUILayout.Button("Copy", GUILayout.Width(100)))
+          {
+            string copyPath = generatePathName(targetingData.name);
+            AnimationRetargetingData copy = Instantiate(targetingData);
+            copy.isPreset = false;
+            saveAsset(copyPath, copy);
+            copy.name = Path.GetFileName(copyPath);
+            targetingData = copy;
+            updateRetargetingOptions();
+            updateRetargetingIndex();
+          }
+
+          if(GUILayout.Button("New", GUILayout.Width(100)))
+          {
+            createInstance<AnimationRetargetingData>("Animation Retargeting", ref targetingData);
+            updateRetargetingOptions();
+            updateRetargetingIndex();
+          }
+        }
+        EditorGUILayout.EndHorizontal();
+        // targetingData = (AnimationRetargetingData)EditorGUILayout.ObjectField(targetingData, typeof(AnimationRetargetingData), false);
         if(targetingData != null)
         {
           SerializedObject so = new SerializedObject(targetingData);
@@ -42,6 +92,11 @@ namespace com.enemyhideout.retargeting
           SerializedProperty itemsProp = windowSO.FindProperty("items");
           EditorGUILayout.PropertyField(itemsProp, new GUIContent("Items"), true);
 
+          if(targetingData.isPreset)
+          {
+            EditorGUILayout.HelpBox( "'" + targetingData.name + "' is a preset and cannot be modified. In order to edit it, make a copy first.", MessageType.Info);
+            GUI.enabled = false;
+          }
           SerializedProperty inputPrefix = so.FindProperty("inputPrefix");
           EditorGUILayout.PropertyField(inputPrefix, new GUIContent("Input Prefix"));
           SerializedProperty outputPrefix = so.FindProperty("outputPrefix");
@@ -51,6 +106,11 @@ namespace com.enemyhideout.retargeting
             EditorGUILayout.HelpBox("You need to add an 'attribute mapping' to retarget your animation properties from one path to another. This is the name of the property you are animating.", MessageType.Info);
           }
           EditorGUILayout.PropertyField(attributeMappings, new GUIContent("Attribute Mappings"), true);
+          if(targetingData.isPreset)
+          {
+            GUI.enabled = true;
+          }
+
           so.ApplyModifiedProperties();
           windowSO.ApplyModifiedProperties();
 
@@ -62,11 +122,16 @@ namespace com.enemyhideout.retargeting
             remapper.Retarget(targetingData, clips);
           }
         }else{
-          // display help
-          EditorGUILayout.HelpBox("In order to retarget animations, you need to create an Animation Retargeting scriptable object or select one of the ones that comes with the project.", MessageType.Info);
-          if(GUILayout.Button("Create Animation Retargeting Data" ))
+          if(retargetingOptions.Count == 0)
           {
-            createInstance<AnimationRetargetingData>("Animation Retargeting", ref targetingData);
+            // display help
+            EditorGUILayout.HelpBox("In order to retarget animations, you need to create an Animation Retargeting scriptable object or select one of the ones that comes with the project.", MessageType.Info);
+            if(GUILayout.Button("Create Animation Retargeting Data" ))
+            {
+              createInstance<AnimationRetargetingData>("Animation Retargeting", ref targetingData);
+            }
+          }else{
+            // the interface should show up as normal.
           }
         }
 
@@ -74,6 +139,13 @@ namespace com.enemyhideout.retargeting
       }
 
       void createInstance<T>(string defaultName, ref T value) where T : ScriptableObject
+      {
+        string path = generatePathName(defaultName);
+        value = ScriptableObject.CreateInstance<T>();
+        saveAsset(path, value);
+      }
+
+      string generatePathName(string defaultName)
       {
         string path = AssetDatabase.GetAssetPath (Selection.activeObject);
         if (path == "") 
@@ -84,12 +156,14 @@ namespace com.enemyhideout.retargeting
         {
           path = path.Replace (Path.GetFileName (AssetDatabase.GetAssetPath (Selection.activeObject)), "");
         }
-
-        value = ScriptableObject.CreateInstance<T>();
         string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath (path + "/"+defaultName+".asset");
-         
-        AssetDatabase.CreateAsset (value, assetPathAndName);
-      
+        return assetPathAndName;
+
+      }
+
+      void saveAsset(string assetPathAndName, UnityEngine.Object obj)
+      {
+        AssetDatabase.CreateAsset (obj, assetPathAndName);
         AssetDatabase.SaveAssets ();
         AssetDatabase.Refresh();
         EditorUtility.FocusProjectWindow ();
@@ -132,6 +206,30 @@ namespace com.enemyhideout.retargeting
           }
         }
         return retVal.Distinct().ToList();
+      }
+
+      void updateRetargetingOptions()
+      {
+        retargetingOptions = new List<AnimationRetargetingData>();
+        string[] guids = AssetDatabase.FindAssets("t:AnimationRetargetingData");
+        retargetingOptionsLabels = new string[guids.Length+1];
+        for(int i=0; i < guids.Length; i++ )
+        {
+          string guid = guids[i];
+          string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+          AnimationRetargetingData option = (AnimationRetargetingData)AssetDatabase.LoadAssetAtPath(assetPath, typeof(AnimationRetargetingData));
+          retargetingOptions.Add(option);
+          retargetingOptionsLabels[i] = option.name;
+        }
+      }
+
+      void updateRetargetingIndex()
+      {
+        if(targetingData == null)
+        {
+          retargetingIndex = 0;
+        }
+        retargetingIndex = retargetingOptions.IndexOf(targetingData);
       }
   }
 }
