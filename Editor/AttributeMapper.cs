@@ -14,6 +14,32 @@ namespace com.enemyhideout.retargeting
           "m_EditorCurves"
         };
 
+        // I could probably do a regex and a full property crawl, but considering the 
+        // size of animation data that could exist I think this is a worthwhile optimization.
+        static List<String> pathProperties = new List<string>{
+          "m_FloatCurves",
+          "m_EditorCurves",
+          "m_RotationCurves",
+          "m_PositionCurves",
+          "m_ScaleCurves"
+
+          /**
+          List of likely suspects taken from yaml:
+          m_RotationCurves
+          m_CompressedRotationCurves
+          m_EulerCurves
+          m_PositionCurves
+          m_ScaleCurves
+          m_FloatCurves
+          m_PPtrCurves
+          m_EditorCurves
+          m_EulerEditorCurves
+          */
+        };
+
+        const string attributePropName = "attribute";
+        const string pathPropName = "path";
+
         StringBuilder logger;
 
         public void Retarget(AnimationRetargetingData targetingData, List<AnimationClip> selectedClips)
@@ -23,68 +49,103 @@ namespace com.enemyhideout.retargeting
           {
             log("[AttributeMapper] Retargeting clip:"  + clip);
             SerializedObject so = new SerializedObject(clip);
+            RemapAttributes(targetingData, so);
+            RemapPaths(targetingData, so);
+            
+            so.ApplyModifiedProperties();
+          }
+          flushLog();
+        }
 
-            foreach(AttributeMapping mapping in targetingData.attributeMappings)
+
+        void RemapAttributes(AnimationRetargetingData targetingData, SerializedObject so)
+        {
+          foreach(AttributeMapping mapping in targetingData.attributeMappings)
+          {
+            List<SerializedProperty> props = propertiesFor(so, attributePropName, targetingData.inputPrefix + "." + mapping.fromPath, MatchType.ExactMatch, baseProperties);
+            if(props.Count == 0)
             {
-              List<SerializedProperty> props = propertiesFor(so, targetingData.inputPrefix + "." + mapping.fromPath, baseProperties);
-              if(props.Count == 0)
+              log("[AttributeMapper] did not find property:"  +mapping.fromPath);
+            }else{
+
+              switch(mapping.action)
               {
-                log("[AttributeMapper] did not find property:"  +mapping.fromPath);
-              }else{
-
-                switch(mapping.action)
-                {
-                  case AttributeMappingAction.Rename:
-                    log("[AttributeMapper] Renaming "+mapping.fromPath +" to " + mapping.toPath);
-                    foreach(SerializedProperty prop in props)
-                    {
-                      // log("[AttributeMapper] found property...modifying."+ prop.propertyPath);
-                      prop.stringValue = targetingData.outputPrefix + "." + mapping.toPath;
-                    }
-                    
-                  break;
-                  case AttributeMappingAction.Copy:
-                    foreach(SerializedProperty prop in props)
-                    {
-                      string initialPath = prop.propertyPath;
-                      SerializedProperty parentProp = parentOf(prop);
-                      int index;
-                      if(tryGetIndexOf(initialPath, out index))
-                      { 
-                        parentProp.InsertArrayElementAtIndex(index);
-                        SerializedProperty dupeProp = parentProp.GetArrayElementAtIndex(index+1).FindPropertyRelative("attribute");
-
-                        // log("[AttributeMapper.COPY] found property...modifying."+ dupeProp.propertyPath);
-                        dupeProp.stringValue = targetingData.outputPrefix + "." + mapping.toPath;
-                      }else{
-                        log("[AttributeMapper] did not find index....");
-                      }
-                    }
-                  break;
-                  case AttributeMappingAction.Delete:
+                case AttributeMappingAction.Rename:
+                  log("[AttributeMapper] Renaming "+mapping.fromPath +" to " + mapping.toPath);
+                  foreach(SerializedProperty prop in props)
+                  {
+                    // log("[AttributeMapper] found property...modifying."+ prop.propertyPath);
+                    prop.stringValue = targetingData.outputPrefix + "." + mapping.toPath;
+                  }
+                  
+                break;
+                case AttributeMappingAction.Copy:
                   foreach(SerializedProperty prop in props)
                   {
                     string initialPath = prop.propertyPath;
                     SerializedProperty parentProp = parentOf(prop);
                     int index;
                     if(tryGetIndexOf(initialPath, out index))
-                    {
-                      parentProp.DeleteArrayElementAtIndex(index);
+                    { 
+                      parentProp.InsertArrayElementAtIndex(index);
+                      SerializedProperty dupeProp = parentProp.GetArrayElementAtIndex(index+1).FindPropertyRelative("attribute");
+
+                      // log("[AttributeMapper.COPY] found property...modifying."+ dupeProp.propertyPath);
+                      dupeProp.stringValue = targetingData.outputPrefix + "." + mapping.toPath;
                     }else{
                       log("[AttributeMapper] did not find index....");
                     }
                   }
-                  break;
-                  
+                break;
+                case AttributeMappingAction.Delete:
+                foreach(SerializedProperty prop in props)
+                {
+                  string initialPath = prop.propertyPath;
+                  SerializedProperty parentProp = parentOf(prop);
+                  int index;
+                  if(tryGetIndexOf(initialPath, out index))
+                  {
+                    parentProp.DeleteArrayElementAtIndex(index);
+                  }else{
+                    log("[AttributeMapper] did not find index....");
+                  }
+                }
+                break;
+                
+              }
+            }
+          }
+        }
+
+        void RemapPaths(AnimationRetargetingData targetingData, SerializedObject so)
+        {
+          foreach(PathMapping mapping in targetingData.pathMappings)
+          {
+            List<SerializedProperty> props = propertiesFor(so, pathPropName, mapping.fromPath, mapping.matchType, pathProperties);
+            if(props.Count == 0)
+            {
+              log("[AttributeMapper] did not find property for path:"  +mapping.fromPath);
+            }else{
+              foreach(SerializedProperty prop in props)
+              {
+                if(mapping.matchType == MatchType.ExactMatch)
+                {
+                log("[AttributeMapper] Renaming "+mapping.fromPath +" to " + mapping.toPath );
+                  prop.stringValue = mapping.toPath;
+                }else if(mapping.matchType == MatchType.Contains)
+                {
+                  string newVal = prop.stringValue.Replace(mapping.fromPath, mapping.toPath);
+                  log("[AttributeMapper] Renaming "+ prop.stringValue +" to " + newVal );
+                  prop.stringValue = newVal;
                 }
               }
             }
-            so.ApplyModifiedProperties();
           }
-          flushLog();
         }
 
-        List<SerializedProperty> propertiesFor(SerializedObject so, string propSearch, List<string> baseProperties)
+
+
+        List<SerializedProperty> propertiesFor(SerializedObject so, string propName, string propValue, MatchType matchType, List<string> baseProperties)
         {
           List<SerializedProperty> retVal = new List<SerializedProperty>();
 
@@ -93,20 +154,29 @@ namespace com.enemyhideout.retargeting
             SerializedProperty curves = so.FindProperty(baseProperty);
             SerializedProperty endSentinel = curves.Copy();
             endSentinel.Next(false);
-            // Log("[AttributeMapper] end:" + endSentinel.propertyPath);
+            // Log("[AttributeMapper] end:" + 
             curves.Next(true);
             curves.Next(true);
             while(curves.Next(false) && !SerializedProperty.EqualContents(curves, endSentinel))
             {
               // Log("[AttributeMapper] prop:" + curves.propertyPath + " " + curves.propertyType);
-              SerializedProperty child = curves.FindPropertyRelative("attribute");
+              SerializedProperty child = curves.FindPropertyRelative(propName);
 
               if(child != null)
               {
-                // Log("[AttributeMapper] child:" + child.propertyPath + " " + child.stringValue);
-                if(child.stringValue == propSearch)
+                if(matchType == MatchType.ExactMatch)
                 {
-                  retVal.Add(child);
+                  // Log("[AttributeMapper] child:" + child.propertyPath + " " + child.stringValue);
+                  if(child.stringValue == propValue)
+                  {
+                    retVal.Add(child);
+                  }
+                }else if(matchType == MatchType.Contains)
+                {
+                  if(child.stringValue.IndexOf(propValue) > -1)
+                  {
+                    retVal.Add(child);
+                  }
                 }
               }else{
                 // log("[AttributeMapper] nope");

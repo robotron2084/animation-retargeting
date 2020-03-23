@@ -86,7 +86,6 @@ namespace com.enemyhideout.retargeting
         {
           SerializedObject so = new SerializedObject(targetingData);
           SerializedObject windowSO = new SerializedObject(this);
-          SerializedProperty attributeMappings = so.FindProperty("attributeMappings");
           EditorGUILayout.HelpBox("Drag Animation Clips, Animators, or Folders into the Items list below to retarget all clips inside them.", MessageType.Info);
           SerializedProperty itemsProp = windowSO.FindProperty("items");
           EditorGUILayout.PropertyField(itemsProp, new GUIContent("Items"), true);
@@ -100,11 +99,18 @@ namespace com.enemyhideout.retargeting
           EditorGUILayout.PropertyField(inputPrefix, new GUIContent("Input Prefix"));
           SerializedProperty outputPrefix = so.FindProperty("outputPrefix");
           EditorGUILayout.PropertyField(outputPrefix, new GUIContent("Output Prefix"));
+          
+          SerializedProperty attributeMappings = so.FindProperty("attributeMappings");
           if(targetingData.attributeMappings.Count == 0)
           {
             EditorGUILayout.HelpBox("You need to add an 'attribute mapping' to retarget your animation properties from one path to another. This is the name of the property you are animating.", MessageType.Info);
           }
           EditorGUILayout.PropertyField(attributeMappings, new GUIContent("Attribute Mappings"), true);
+
+          SerializedProperty pathMappings = so.FindProperty("pathMappings");
+          EditorGUILayout.PropertyField(pathMappings, new GUIContent("Path Mappings"), true);
+
+
           if(targetingData.isPreset)
           {
             GUI.enabled = true;

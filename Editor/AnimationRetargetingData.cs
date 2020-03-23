@@ -12,6 +12,7 @@ namespace com.enemyhideout.retargeting
         public string inputPrefix = "";
         public string outputPrefix = "";
         public List<AttributeMapping> attributeMappings = new List<AttributeMapping>();
+        public List<PathMapping> pathMappings = new List<PathMapping>();
 
 
     }
