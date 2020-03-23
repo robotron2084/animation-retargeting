@@ -14,9 +14,6 @@ namespace com.enemyhideout.retargeting
             // prefab override logic works on the entire property.
             EditorGUI.BeginProperty(position, label, property);
 
-            // Draw label
-            position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
-
             // Don't make child fields be indented
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
