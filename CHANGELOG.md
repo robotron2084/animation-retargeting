@@ -10,3 +10,8 @@ First Release
  * Items - Its now possible to add folders and animators to the list of clips and modify all clips inside them.
    * Presets no longer include a list of items, they are now saved with the editor window.
  * Logging - When retargeting all log entries are now consolidated into one long one.
+
+# 0.0.3
+  * Path Mapping - It is now possible to map paths of game objects in addition to attributes.
+  * Better UI - Attributes and paths now lay out horizontally in a much more compact fashion.
+  
