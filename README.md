@@ -54,7 +54,7 @@ There are three parameters to remapping a path:
       * Example: From: `grandparent/parent/child' To: `grandparent/child` will replace all instances of `grandparent/parent/child' found with `grandparent/child`
     * `Contains` - Replaces instances of `From Path` with instances of `To Path`
       * Example: From: `grandparent` To: `parent` with the path `grandparent/parent/child' will create the path `parent/parent/child`
-      * Example: From: `parent/` To: `` with the path `grandparent/parent/child' will create the path `grandparent/child`
+      * Example: From: `parent/` To: ''(blank) with the path `grandparent/parent/child' will create the path `grandparent/child`
 Once you have input your clips and mappings, then press the `Retarget` button, and the tool will iterate over your animation clips and update them. And that's it! A log of all modifications, and any issues, will be displayed in the Console.
 
 ## Retargeting Presets
