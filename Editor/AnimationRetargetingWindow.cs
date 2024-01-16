@@ -194,6 +194,7 @@ namespace com.enemyhideout.retargeting
         void SetAttributeMappingsHelpBoxState(int next_count = 0)
         {
             if (lv_attribute_mappings == null
+                || lv_attribute_mappings.itemsSource == null
                 || attribute_mappings_help_box == null)
             {
                 return;
@@ -362,6 +363,7 @@ namespace com.enemyhideout.retargeting
                 if (newIndex != retargetingIndex)
                 {
                     retargetingIndex = newIndex;
+                    targetingDataSO = null;
                 }                
                 if(retargetingIndex > -1)
                 {
