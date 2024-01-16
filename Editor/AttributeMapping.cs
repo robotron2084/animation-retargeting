@@ -1,7 +1,4 @@
-using UnityEngine;
-using UnityEditor;
-using System.Collections;
-using System.Collections.Generic;
+using System;
 
 namespace com.enemyhideout.retargeting
 {
@@ -19,7 +16,7 @@ namespace com.enemyhideout.retargeting
         Contains
     }
 
-    [System.Serializable]
+    [Serializable]
     public class AttributeMapping
     {
         public string fromPath;
@@ -32,7 +29,7 @@ namespace com.enemyhideout.retargeting
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class PathMapping
     {
         public string fromPath;
